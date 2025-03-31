@@ -44,7 +44,6 @@ header {
 
 /* Main  */
 main {
-  position: relative;
   display: flex;
   /* justify-content: space-around; */
   width: 100%;
@@ -257,4 +256,25 @@ main {
     rgba(0, 0, 0, 0.2) 0%,
     rgba(0, 0, 0, 0.5) 100%
   );
+}
+.page {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  cursor: default;
+  margin-right: 10%;
+}
+.page .page-btn {
+  border: none;
+  background-color: #1b2838;
+  color: #fff;
+  font-size: 16px;
+}
+.page li {
+  list-style: none;
+  margin: 0 10px;
+}
+.page li:hover {
+  cursor: pointer;
+  filter: brightness(200%);
 }

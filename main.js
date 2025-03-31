@@ -2,7 +2,8 @@ const url = "https://games-details.p.rapidapi.com/page/1";
 const options = {
   method: "GET",
   headers: {
-    "x-rapidapi-key": "fda47a192cmsh147ed7fb590202ep1cae0fjsnab9753a6463e",
+    // "x-rapidapi-key": "fda47a192cmsh147ed7fb590202ep1cae0fjsnab9753a6463e",
+    "x-rapidapi-key": "8a661989f6msh86cadfb94f25047p136a5fjsne92ebd871bc1",
     "x-rapidapi-host": "games-details.p.rapidapi.com",
   },
 };
@@ -12,13 +13,14 @@ const showDetail = document.querySelector(".show-detail");
 const searchInput = document.querySelector("#searchForm");
 const searchButton = document.querySelector(".search-btn");
 const categoryItems = document.querySelector(".category-items");
+const pageNum = document.querySelector(".page");
 
 let loading = false;
-const getData = async () => {
+const getData = async (pageNumber) => {
   if (loading) return;
-  display.innerHTML = `<div class="loader"> Loading Data...</div>`;
-  let data = {};
-  // let url = `${BASE_URL}/${endpoint}/Counter/${value}`;
+  display.innerHTML = `<div class="loader"> Loading Data Page...</div>`;
+  pageNum.innerHTML = "";
+  let url = `https://games-details.p.rapidapi.com/page/${pageNumber}`;
   try {
     const response = await fetch(url, options);
     const data = await response.json();
@@ -29,34 +31,11 @@ const getData = async () => {
     console.error(error);
   }
 };
-const renderDisplay = async () => {
-  try {
-    const data = await getData();
-    const showingGames = document.querySelector(".showing-game");
-    showingGames.className = "showing-game";
-    showingGames.innerHTML = "";
-    data.forEach((game) => {
-      const newDiv = document.createElement("div");
-      newDiv.innerHTML = `<div class="game-wrapper">
-                            <div class="cover">
-                              <img src="${game.img}" alt="img" class="img-game" onClick="appDetail(${game.id})">
-                            </div>
-                            <div class="game-info">
-                              <p id="gameTitle">${game.name}</p>
-                              <p id="price">${game.price}</p>
-                            </div>
-                          </div>`;
-      showingGames.appendChild(newDiv);
-    });
-  } catch (error) {
-    console.log("err", err);
-  }
-};
-
 const getDetail = async (value) => {
   const urlDetail = `https://games-details.p.rapidapi.com/gameinfo/single_game/${value}`;
   if (loading) return;
-  display.innerHTML = `<div class="loader"> Loading Data...</div>`;
+  display.innerHTML = `<div class="loader"> Loading Data Detail...</div>`;
+  pageNum.innerHTML = "";
   let data = {};
   try {
     const response = await fetch(urlDetail, options);
@@ -71,7 +50,8 @@ const getDetail = async (value) => {
 const getSearch = async (value) => {
   const urlSearch = `https://games-details.p.rapidapi.com/search?sugg=${value}`;
   if (loading) return;
-  display.innerHTML = `<div class="loader"> Loading Data...</div>`;
+  display.innerHTML = `<div class="loader"> Loading Data Search Game...</div>`;
+  pageNum.innerHTML = "";
   let data = {};
   try {
     const response = await fetch(urlSearch, options);
@@ -83,8 +63,37 @@ const getSearch = async (value) => {
     console.error(error);
   }
 };
+const renderDisplay = async (value) => {
+  try {
+    const data = await getData(value);
+    const showingGames = document.querySelector(".showing-game");
+    showingGames.classList.remove("show-detail");
+    showingGames.innerHTML = "";
+    data.forEach((game) => {
+      const newDiv = document.createElement("div");
+      newDiv.innerHTML = `<div class="game-wrapper">
+                            <div class="cover">
+                              <img src="${game.img}" alt="img" class="img-game" onClick="appDetail(${game.id})">
+                            </div>
+                            <div class="game-info">
+                              <p id="gameTitle">${game.name}</p>
+                              <p id="price">${game.price}</p>
+                            </div>
+                          </div>`;
+      showingGames.appendChild(newDiv);
+    });
+    pageNum.innerHTML = `Page
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>`;
+  } catch (error) {
+    console.log("err", error);
+  }
+};
+
 const renderDetailGame = async (data, appID) => {
-  showDetail.className = "show-detail";
   showDetail.innerHTML = "";
   displayTitle.innerHTML = `${data.name}`;
   const newDiv = document.createElement("div");
@@ -148,8 +157,13 @@ const renderDetailGame = async (data, appID) => {
 };
 const searchDisplay = (games) => {
   const showingGames = document.querySelector(".showing-game");
-  showingGames.className = "showing-game";
+  if (!showingGames) {
+    console.error("Error: .showing-game element not found.");
+    return;
+  }
   showingGames.innerHTML = "";
+  showingGames.className = "showing-game";
+  displayTitle.innerHTML = "Search";
   games.forEach((game) => {
     const newDiv = document.createElement("div");
     newDiv.innerHTML = `<div class="game-wrapper">
@@ -176,7 +190,13 @@ categoryItems.addEventListener("click", (e) => {
   console.log(value);
   searchGame(value);
 });
+pageNum.addEventListener("click", (e) => {
+  e.preventDefault();
+  const value = e.target.innerText;
+  renderDisplay(value);
+});
 const searchGame = async (value) => {
+  showDetail.innerHTML = "";
   const data = await getSearch(value);
   searchDisplay(data);
 };
@@ -186,4 +206,5 @@ const appDetail = async (appId) => {
   renderDetailGame(data, appId);
 };
 
-renderDisplay();
+//Default
+renderDisplay("1");
