@@ -17,8 +17,6 @@ const pageNum = document.querySelector(".page");
 
 let loading = false;
 const getData = async (pageNumber) => {
-  if (loading) return;
-  display.innerHTML = `<div class="loader"> Loading Data Page...</div>`;
   pageNum.innerHTML = "";
   let url = `https://games-details.p.rapidapi.com/page/${pageNumber}`;
   try {
@@ -33,8 +31,6 @@ const getData = async (pageNumber) => {
 };
 const getDetail = async (value) => {
   const urlDetail = `https://games-details.p.rapidapi.com/gameinfo/single_game/${value}`;
-  if (loading) return;
-  display.innerHTML = `<div class="loader"> Loading Data Detail...</div>`;
   pageNum.innerHTML = "";
   let data = {};
   try {
@@ -49,8 +45,6 @@ const getDetail = async (value) => {
 };
 const getSearch = async (value) => {
   const urlSearch = `https://games-details.p.rapidapi.com/search?sugg=${value}`;
-  if (loading) return;
-  display.innerHTML = `<div class="loader"> Loading Data Search Game...</div>`;
   pageNum.innerHTML = "";
   let data = {};
   try {
@@ -69,7 +63,7 @@ const renderDisplay = async (value) => {
     const showingGames = document.querySelector(".showing-game");
     showingGames.classList.remove("show-detail");
     showingGames.innerHTML = "";
-    data.forEach((game) => {
+    data.data.pages.forEach((game) => {
       const newDiv = document.createElement("div");
       newDiv.innerHTML = `<div class="game-wrapper">
                             <div class="cover">
@@ -164,7 +158,7 @@ const searchDisplay = (games) => {
   showingGames.innerHTML = "";
   showingGames.className = "showing-game";
   displayTitle.innerHTML = "Search";
-  games.forEach((game) => {
+  games.data.search.forEach((game) => {
     const newDiv = document.createElement("div");
     newDiv.innerHTML = `<div class="game-wrapper">
     <div class="cover">
