@@ -17,8 +17,6 @@ const pageNum = document.querySelector(".page");
 
 let loading = false;
 const getData = async (pageNumber) => {
-  if (loading) return;
-  display.innerHTML = `<div class="loader"> Loading Data Page...</div>`;
   pageNum.innerHTML = "";
   let url = `https://games-details.p.rapidapi.com/page/${pageNumber}`;
   try {
