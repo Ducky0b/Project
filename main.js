@@ -102,8 +102,8 @@ const renderDetailGame = async (data, appID) => {
                         <div class="info-game">
                             <p>Recent Reviews: Very Positive</p>
                             <p>Release Date: ${data.release_date}</p>
-                            <p>Developer: ${data.dev_details.developer_name[0]}</p>
-                            <p>Pulisher: ${data.dev_details.publisher[0]}</p>
+                            <p>Developer: ${data.data.dev_details.developer_name[0]}</p>
+                            <p>Pulisher: ${data.data.dev_details.publisher[0]}</p>
                         </div>
                     </div>
                 </div>
