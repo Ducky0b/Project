@@ -17,6 +17,8 @@ const pageNum = document.querySelector(".page");
 
 let loading = false;
 const getData = async (pageNumber) => {
+  if (loading) return;
+  display.innerHTML = `<div class="loader"> Loading Data Page...</div>`;
   pageNum.innerHTML = "";
   let url = `https://games-details.p.rapidapi.com/page/${pageNumber}`;
   try {
@@ -45,12 +47,14 @@ const getDetail = async (value) => {
 };
 const getSearch = async (value) => {
   const urlSearch = `https://games-details.p.rapidapi.com/search?sugg=${value}`;
+  if (loading) return;
+  display.innerHTML = `<div class="loader"> Loading Data Search Game...</div>`;
   pageNum.innerHTML = "";
   let data = {};
   try {
     const response = await fetch(urlSearch, options);
     const data = await response.json();
-    console.log(data);
+    console.log(data.data.search);
     loading = false;
     return data;
   } catch (error) {
@@ -89,16 +93,16 @@ const renderDisplay = async (value) => {
 
 const renderDetailGame = async (data, appID) => {
   showDetail.innerHTML = "";
-  displayTitle.innerHTML = `${data.name}`;
+  displayTitle.innerHTML = `${data.data.name}`;
   const newDiv = document.createElement("div");
   newDiv.innerHTML = `<div class="show-detail" id="display">
-                <div class="title">${data.name}</div>
+                <div class="title">${data.data.name}</div>
                 <div class="detail-img">
                     <img
                         src="https://cdn.akamai.steamstatic.com/steam/apps/${appID}/header.jpg"
                         alt="Counter-Strike 2">
                     <div class="detail-game">
-                        <div class="game-desc">${data.desc}</div>
+                        <div class="game-desc">${data.data.desc}</div>
                         <div class="info-game">
                             <p>Recent Reviews: Very Positive</p>
                             <p>Release Date: ${data.release_date}</p>
@@ -110,46 +114,46 @@ const renderDetailGame = async (data, appID) => {
                 <div class="tags-game">
                     Popular user-defined tags for this product:
                     <div class="tags">
-                        <div class="tag">${data.tags[0]}</div>
-                        <div class="tag">${data.tags[1]}</div>
-                        <div class="tag">${data.tags[2]}</div>
-                        <div class="tag">${data.tags[3]}petitive</div>
-                        <div class="tag">${data.tags[4]}vival</div>
-                        <div class="tag">${data.tags[5]}m-Based</div>
-                        <div class="tag">${data.tags[6]}-Down</div>
+                        <div class="tag">${data.data.tags[0]}</div>
+                        <div class="tag">${data.data.tags[1]}</div>
+                        <div class="tag">${data.data.tags[2]}</div>
+                        <div class="tag">${data.data.tags[3]}petitive</div>
+                        <div class="tag">${data.data.tags[4]}vival</div>
+                        <div class="tag">${data.data.tags[5]}m-Based</div>
+                        <div class="tag">${data.data.tags[6]}-Down</div>
                     </div>
                     Popular languages for this product:
                     <div class="tags">
-                        <div class="tag">${data.lang[0]}</div>
-                        <div class="tag">${data.lang[1]}</div>
-                        <div class="tag">${data.lang[2]}</div>
-                        <div class="tag">${data.lang[3]}</div>
-                        <div class="tag">${data.lang[4]}</div>
-                        <div class="tag">${data.lang[5]}</div>
-                        <div class="tag">${data.lang[6]}</div>
+                        <div class="tag">${data.data.lang[0]}</div>
+                        <div class="tag">${data.data.lang[1]}</div>
+                        <div class="tag">${data.data.lang[2]}</div>
+                        <div class="tag">${data.data.lang[3]}</div>
+                        <div class="tag">${data.data.lang[4]}</div>
+                        <div class="tag">${data.data.lang[5]}</div>
+                        <div class="tag">${data.data.lang[6]}</div>
                     </div>
                 </div>
                 <div class="about-game">
                     <div class="title-about-game">About Game</div>
                     <div class="content-game">
-                        ${data.about_game}
+                        ${data.data.about_game}
                     </div>
                 </div>
                 <div class="sys-required">
                     <div class="title-sys">System Required</div>
                     <div class="recommend-sys">
-                        <p>${data.sys_req.window.recomm[0]}</p>
-                        <p>${data.sys_req.window.recomm[1]}</p>
-                        <p>${data.sys_req.window.recomm[2]}</p>
-                        <p>${data.sys_req.window.recomm[3]}</p>
-                        <p>${data.sys_req.window.recomm[4]}</p>
-                        <p>${data.sys_req.window.recomm[5]}</p>
+                        <p>${data.data.sys_req.window.recomm[0]}</p>
+                        <p>${data.data.sys_req.window.recomm[1]}</p>
+                        <p>${data.data.sys_req.window.recomm[2]}</p>
+                        <p>${data.data.sys_req.window.recomm[3]}</p>
+                        <p>${data.data.sys_req.window.recomm[4]}</p>
+                        <p>${data.data.sys_req.window.recomm[5]}</p>
                     </div>
                 </div>
             </div>`;
   showDetail.appendChild(newDiv);
 };
-const searchDisplay = (games) => {
+const searchDisplay = (data) => {
   const showingGames = document.querySelector(".showing-game");
   if (!showingGames) {
     console.error("Error: .showing-game element not found.");
@@ -158,19 +162,24 @@ const searchDisplay = (games) => {
   showingGames.innerHTML = "";
   showingGames.className = "showing-game";
   displayTitle.innerHTML = "Search";
-  games.data.search.forEach((game) => {
-    const newDiv = document.createElement("div");
-    newDiv.innerHTML = `<div class="game-wrapper">
-    <div class="cover">
-      <img src="${game.small_cap}" alt="img" class="img-game" onClick="appDetail(${game.id})">
-    </div>
-    <div class="game-info">
-      <p id="gameTitle">${game.name}</p>
-      <p id="price">${game.price}</p>
-    </div>
-  </div>`;
-    showingGames.appendChild(newDiv);
-  });
+
+  if (data && Array.isArray(data.data.search)) {
+    data.data.search.forEach((game) => {
+      const newDiv = document.createElement("div");
+      newDiv.innerHTML = `<div class="game-wrapper">
+        <div class="cover">
+          <img src="${game.image}" alt="img" class="img-game" onClick="appDetail(${game.id})">
+        </div>
+        <div class="game-info">
+          <p id="gameTitle">${game.name}</p>
+          <p id="price">${game.price}</p>
+        </div>
+      </div>`;
+      showingGames.appendChild(newDiv);
+    });
+  } else {
+    console.error("Error: No search results found or invalid data structure.");
+  }
 };
 searchButton.addEventListener("click", (e) => {
   e.preventDefault();
@@ -189,6 +198,7 @@ pageNum.addEventListener("click", (e) => {
   const value = e.target.innerText;
   renderDisplay(value);
 });
+
 const searchGame = async (value) => {
   showDetail.innerHTML = "";
   const data = await getSearch(value);
@@ -201,4 +211,5 @@ const appDetail = async (appId) => {
 };
 
 //Default
-renderDisplay("1");
+// renderDisplay("1");
+searchDisplay("cs");
