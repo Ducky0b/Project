@@ -211,5 +211,4 @@ const appDetail = async (appId) => {
 };
 
 //Default
-// renderDisplay("1");
-searchDisplay("cs");
+renderDisplay("1");
